@@ -1,7 +1,7 @@
 package com.mycompany.chatapppart2;
 
 import java.util.Random;
-
+mnm
 public class Message {
 
     private String messageId;
