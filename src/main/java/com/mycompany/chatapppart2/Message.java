@@ -1,13 +1,13 @@
 package com.mycompany.chatapppart2;
 
-import java.util.Random;
+import java.util.UUID;
 
 public class Message {
 
-    private String messageId;
-    private int messageNumber;
-    private String recipient;
-    private String message;
+    private final String messageId;
+    private final int messageNumber;
+    private final String recipient;
+    private final String message;
 
     public Message(int messageNumber, String recipient, String message) {
         this.messageNumber = messageNumber;
@@ -16,47 +16,66 @@ public class Message {
         this.messageId = generateId();
     }
 
-    // FIXED: safe 10-digit ID
     public String generateId() {
-        Random r = new Random();
-        int id = 100000000 + r.nextInt(900000000);
-        return String.valueOf(id);
+        // Generate a unique ID that is no longer than 10 characters.
+        return UUID.randomUUID().toString()
+                .replace("-", "")
+                .substring(0, 10);
     }
 
     public boolean checkMessageID() {
-        return messageId.length() == 9; // safer check
+        return messageId != null
+                && !messageId.isEmpty()
+                && messageId.length() <= 10;
     }
 
-    public boolean checkRecipient() {
-        return recipient.startsWith("+") && recipient.length() <= 13;
+    public boolean checkRecipientCell() {
+        // South African international format: +27 followed by 9 digits.
+        return recipient != null
+                && recipient.matches("\\+27\\d{9}");
     }
 
     public boolean validMessage() {
-        return message != null && message.length() <= 250;
+        return message != null
+                && !message.trim().isEmpty()
+                && message.length() <= 250;
     }
 
-    // FIXED HASH (SAFE + CLEAN)
-    public String createHash() {
-
+    public String createMessageHash() {
         if (message == null || message.trim().isEmpty()) {
-            return "00:0:EMPTY";
+            return messageId.substring(0, 2)
+                    + ":" + messageNumber + ":";
         }
 
-        String[] words = message.trim().split(" ");
+        String[] words = message.trim().split("\\s+");
+        String firstWord = words[0].toUpperCase();
+        String lastWord = words[words.length - 1].toUpperCase();
 
-        String first = words[0];
-        String last = words[words.length - 1];
-
-        return (messageId.substring(0, 2)
+        return messageId.substring(0, 2)
                 + ":" + messageNumber
-                + ":" + first.toUpperCase()
-                + last.toUpperCase());
+                + ":" + firstWord + lastWord;
     }
 
-    public String getDetails() {
-        return "Message ID: " + messageId +
-                "\nMessage Hash: " + createHash() +
-                "\nRecipient: " + recipient +
-                "\nMessage: " + message;
+    public String stringSentMessage() {
+        return "Message ID: " + messageId
+                + "\nMessage Hash: " + createMessageHash()
+                + "\nRecipient: " + recipient
+                + "\nMessage: " + message;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public int getMessageNumber() {
+        return messageNumber;
+    }
+
+    public String getRecipient() {
+        return recipient;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
