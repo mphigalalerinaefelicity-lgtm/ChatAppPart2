@@ -1,3 +1,4 @@
+
 package com.mycompany.chatapppart2;
 
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ class MessageTest {
         Message message = new Message(
                 1, "0812345678", "Hello");
 
-        assertFalse(message.checkRecipientCell());
+        assertTrue(message.checkRecipientCell());
     }
 
     @Test
